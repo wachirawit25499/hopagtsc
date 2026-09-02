@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  TENANT
+  TECHNICIAN
+  ADMIN
+}
+
+enum TicketStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// ผู้ใช้งานระบบ (นักเรียนนักศึกษา / ช่าง / Admin)
+model User {
+  id           String   @id @default(cuid())
+  tenantCode   String   @unique
+  email        String   @unique
+  passwordHash String
+  namePrefix   String?
+  firstName    String
+  lastName     String
+  phoneNumber  String?
+  dormitory    String?
+  roomNumber   String?
+  role         Role     @default(TENANT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tickets      RepairTicket[]
+  statusLogs   StatusChangeLog[]
+
+  @@index([role])
+  @@index([phoneNumber])
+}
+
+/// ใบแจ้งซ่อม
+model RepairTicket {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  location    String
+  imagePath   String?
+  status      TicketStatus @default(PENDING)
+  reporterId  String
+  reporter    User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  statusLogs  StatusChangeLog[]
+
+  @@index([status])
+  @@index([reporterId])
+  @@index([createdAt])
+  @@index([status, createdAt])
+}
+
+/// ประวัติการเปลี่ยนสถานะใบแจ้งซ่อม (Audit log)
+model StatusChangeLog {
+  id         String        @id @default(cuid())
+  ticketId   String
+  ticket     RepairTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromStatus TicketStatus?
+  toStatus   TicketStatus
+  changedById String
+  changedBy  User          @relation(fields: [changedById], references: [id], onDelete: Cascade)
+  note       String?
+  createdAt  DateTime      @default(now())
+
+  @@index([ticketId])
+  @@index([changedById])
+  @@index([createdAt])
+}

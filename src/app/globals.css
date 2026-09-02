@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --bd-bg: #e8ecf1;
+  --bd-bg-deep: #d5dce6;
+  --bd-surface: #f7f8fa;
+  --bd-ink: #1c2430;
+  --bd-muted: #5b6777;
+  --bd-line: #c8d0db;
+  --bd-accent: #243447;
+  --bd-accent-hover: #1a2634;
+  --bd-secondary: #8a95a5;
+  --bd-secondary-hover: #6f7b8c;
+  --bd-pending: #8a6d3b;
+  --bd-pending-bg: #f3ead8;
+  --bd-progress: #2f5f8a;
+  --bd-progress-bg: #dceaf5;
+  --bd-done: #2f6b4f;
+  --bd-done-bg: #dcefe6;
+  --background: var(--bd-bg);
+  --foreground: var(--bd-ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-kanit);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--bd-ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.7), transparent 55%),
+    linear-gradient(160deg, var(--bd-bg) 0%, var(--bd-bg-deep) 100%);
+  font-family: var(--font-kanit), "Kanit", sans-serif;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.55s ease-out both;
+}
+
+.animate-soft-in {
+  animation: soft-in 0.45s ease-out both;
+}
+
+.delay-1 {
+  animation-delay: 0.08s;
+}
+
+.delay-2 {
+  animation-delay: 0.16s;
+}
+
+.delay-3 {
+  animation-delay: 0.24s;
+}
