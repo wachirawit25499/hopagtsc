@@ -30,6 +30,20 @@ export default function RegisterPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (form.password.length < 6) {
+      setError("กรุณาใส่รหัสผ่านให้ครบ 6 หลัก");
+      return;
+    }
+    if (form.confirmPassword.length < 6) {
+      setError("กรุณายืนยันรหัสผ่านให้ครบ 6 หลัก");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      setError("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -154,7 +168,7 @@ export default function RegisterPage() {
           />
           <PasswordField
             id="password"
-            label="รหัสผ่าน (ตัวเลขไม่เกิน 6 หลัก)"
+            label="รหัสผ่าน (ตัวเลข 6 หลัก)"
             value={form.password}
             onChange={(v) => update("password", v)}
             required

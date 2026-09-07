@@ -18,8 +18,15 @@ type UserEditData = {
   role: Role;
 };
 
-export function AdminUserEditForm({ user }: { user: UserEditData }) {
+export function AdminUserEditForm({
+  user,
+  currentAdminId,
+}: {
+  user: UserEditData;
+  currentAdminId: string;
+}) {
   const router = useRouter();
+  const isSelf = user.id === currentAdminId;
   const [form, setForm] = useState({
     tenantCode: user.tenantCode,
     namePrefix: user.namePrefix ?? "",
@@ -34,6 +41,7 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -43,6 +51,12 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (form.password && form.password.length < 6) {
+      setError("กรุณาใส่รหัสผ่านให้ครบ 6 หลัก");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -63,6 +77,39 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
       setError("ไม่สามารถเชื่อมต่อระบบได้");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function onDelete() {
+    if (isSelf) {
+      setError("ไม่สามารถลบบัญชีของตัวเองได้");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `ต้องการลบบัญชี ${user.tenantCode} หรือไม่?\nใบแจ้งซ่อมและประวัติที่เกี่ยวข้องจะถูกลบด้วย`,
+    );
+    if (!confirmed) return;
+
+    setError("");
+    setSuccess("");
+    setDeleting(true);
+
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "ลบบัญชีไม่สำเร็จ");
+        return;
+      }
+      router.push("/admin/database");
+      router.refresh();
+    } catch {
+      setError("ไม่สามารถเชื่อมต่อระบบได้");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -145,7 +192,7 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
         </select>
       </div>
       <Field
-        label="รหัสผ่านใหม่ (เว้นว่างหากไม่เปลี่ยน)"
+        label="รหัสผ่านใหม่ 6 หลัก (เว้นว่างหากไม่เปลี่ยน)"
         type="password"
         value={form.password}
         onChange={(v) => update("password", v.replace(/\D/g, "").slice(0, 6))}
@@ -167,7 +214,7 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
       <div className="flex flex-wrap gap-2 pt-1">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || deleting}
           className="rounded-xl bg-[var(--bd-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--bd-accent-hover)] disabled:opacity-60"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
@@ -178,7 +225,21 @@ export function AdminUserEditForm({ user }: { user: UserEditData }) {
         >
           กลับ
         </Link>
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={loading || deleting || isSelf}
+          title={isSelf ? "ไม่สามารถลบบัญชีของตัวเองได้" : "ลบบัญชีนี้"}
+          className="ml-auto rounded-xl bg-[#c45c5c] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#a94848] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {deleting ? "กำลังลบ..." : "ลบบัญชี"}
+        </button>
       </div>
+      {isSelf && (
+        <p className="text-xs text-[var(--bd-muted)]">
+          ไม่สามารถลบบัญชีที่กำลังเข้าสู่ระบบอยู่ได้
+        </p>
+      )}
     </form>
   );
 }

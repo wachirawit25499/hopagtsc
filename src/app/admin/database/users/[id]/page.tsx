@@ -46,7 +46,7 @@ export default async function AdminEditUserPage({ params }: Props) {
           </h1>
         </div>
         <div className="animate-soft-in rounded-2xl bg-[var(--bd-surface)] p-6 shadow-[0_10px_30px_rgba(28,36,48,0.08)]">
-          <AdminUserEditForm user={user} />
+          <AdminUserEditForm user={user} currentAdminId={admin.id} />
         </div>
       </main>
     </div>

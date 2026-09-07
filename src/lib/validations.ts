@@ -15,7 +15,9 @@ export const namePrefixSchema = z.enum(NAME_PREFIXES, {
 
 export const passwordSchema = z
   .string()
-  .regex(/^\d{1,6}$/, "รหัสผ่านต้องเป็นตัวเลขไม่เกิน 6 หลักเท่านั้น");
+  .min(1, "กรุณากรอกรหัสผ่าน")
+  .regex(/^\d+$/, "รหัสผ่านต้องเป็นตัวเลขเท่านั้น")
+  .length(6, "กรุณาใส่รหัสผ่านให้ครบ 6 หลัก");
 
 export const phoneNumberSchema = z
   .string()
@@ -97,12 +99,20 @@ export const adminUpdateUserSchema = z
       });
     }
     const password = data.password.trim();
-    if (password && !/^\d{1,6}$/.test(password)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["password"],
-        message: "รหัสผ่านต้องเป็นตัวเลขไม่เกิน 6 หลักเท่านั้น",
-      });
+    if (password) {
+      if (!/^\d+$/.test(password)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["password"],
+          message: "รหัสผ่านต้องเป็นตัวเลขเท่านั้น",
+        });
+      } else if (password.length !== 6) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["password"],
+          message: "กรุณาใส่รหัสผ่านให้ครบ 6 หลัก",
+        });
+      }
     }
   });
 

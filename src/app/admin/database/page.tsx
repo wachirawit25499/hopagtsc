@@ -49,7 +49,7 @@ export default async function AdminDatabasePage() {
             จัดการฐานข้อมูล
           </h1>
           <p className="mt-1 text-sm text-[var(--bd-muted)]">
-            ดูและแก้ไขข้อมูลผู้ใช้กับใบแจ้งซ่อม (เฉพาะผู้ดูแลระบบ)
+            ดู แก้ไข และลบข้อมูลผู้ใช้กับใบแจ้งซ่อม (เฉพาะผู้ดูแลระบบ)
           </p>
         </div>
 

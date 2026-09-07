@@ -17,6 +17,12 @@ export default function LoginPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (password.length < 6) {
+      setError("กรุณาใส่รหัสผ่านให้ครบ 6 หลัก");
+      return;
+    }
+
     setLoading(true);
 
     try {

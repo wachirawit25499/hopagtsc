@@ -123,3 +123,32 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "เกิดข้อผิดพลาดในระบบ" }, { status: 500 });
   }
 }
+
+export async function DELETE(_request: Request, { params }: Params) {
+  const auth = await requireAdmin();
+  if ("error" in auth && auth.error) {
+    return auth.error;
+  }
+
+  try {
+    const { id } = await params;
+
+    if (auth.user!.id === id) {
+      return NextResponse.json(
+        { error: "ไม่สามารถลบบัญชีของตัวเองได้" },
+        { status: 400 },
+      );
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "ไม่พบผู้ใช้" }, { status: 404 });
+    }
+
+    await prisma.user.delete({ where: { id } });
+
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "เกิดข้อผิดพลาดในระบบ" }, { status: 500 });
+  }
+}
