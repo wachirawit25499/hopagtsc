@@ -195,7 +195,7 @@
 |-------|------|----------|
 | id | CUID | Primary key |
 | title / description / location | String | ข้อมูลใบแจ้งซ่อม |
-| imagePath | String? | path รูป (`/uploads/...`) |
+| imagePath | String? | path รูป (`/uploads/...`) เก็บใน Volume `/data/uploads` บน Railway |
 | status | Enum | PENDING \| IN_PROGRESS \| COMPLETED |
 | reporterId | FK → User | ผู้แจ้ง (onDelete Cascade) |
 | createdAt / updatedAt | DateTime | |

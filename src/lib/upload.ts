@@ -11,6 +11,17 @@ const ALLOWED_TYPES = new Set([
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
+export function getUploadDir() {
+  return (
+    process.env.UPLOAD_DIR?.trim() ||
+    path.join(process.cwd(), "data", "uploads")
+  );
+}
+
+export function isSafeUploadFilename(filename: string) {
+  return /^[a-f0-9-]{36}\.(jpg|png|webp|gif)$/i.test(filename);
+}
+
 export async function saveRepairImage(file: File): Promise<string> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("รองรับเฉพาะไฟล์รูป JPG, PNG, WEBP หรือ GIF");
@@ -30,7 +41,7 @@ export async function saveRepairImage(file: File): Promise<string> {
           : "gif";
 
   const filename = `${randomUUID()}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  const uploadDir = getUploadDir();
   await mkdir(uploadDir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());

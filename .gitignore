@@ -50,3 +50,5 @@ next-env.d.ts
 # uploaded repair images
 /public/uploads/*
 !/public/uploads/.gitkeep
+/data/uploads/
+/data/uploads/**
