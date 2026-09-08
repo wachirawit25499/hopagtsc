@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { deleteRepairImageFile } from "@/lib/upload";
 import { adminUpdateRepairSchema } from "@/lib/validations";
 
 type Params = { params: Promise<{ id: string }> };
@@ -61,6 +62,28 @@ export async function PATCH(request: Request, { params }: Params) {
     });
 
     return NextResponse.json({ ticket });
+  } catch {
+    return NextResponse.json({ error: "เกิดข้อผิดพลาดในระบบ" }, { status: 500 });
+  }
+}
+
+export async function DELETE(_request: Request, { params }: Params) {
+  const auth = await requireAdmin();
+  if ("error" in auth && auth.error) {
+    return auth.error;
+  }
+
+  try {
+    const { id } = await params;
+    const existing = await prisma.repairTicket.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "ไม่พบใบแจ้งซ่อม" }, { status: 404 });
+    }
+
+    await prisma.repairTicket.delete({ where: { id } });
+    await deleteRepairImageFile(existing.imagePath);
+
+    return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "เกิดข้อผิดพลาดในระบบ" }, { status: 500 });
   }

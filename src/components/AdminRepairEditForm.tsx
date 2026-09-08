@@ -17,8 +17,17 @@ type RepairEditData = {
   status: TicketStatus;
 };
 
-export function AdminRepairEditForm({ ticket }: { ticket: RepairEditData }) {
+export function AdminRepairEditForm({
+  ticket,
+  cancelHref = "/admin/database",
+  afterDeleteHref,
+}: {
+  ticket: RepairEditData;
+  cancelHref?: string;
+  afterDeleteHref?: string;
+}) {
   const router = useRouter();
+  const deleteHref = afterDeleteHref ?? cancelHref;
   const [form, setForm] = useState({
     title: ticket.title,
     description: ticket.description,
@@ -28,6 +37,7 @@ export function AdminRepairEditForm({ ticket }: { ticket: RepairEditData }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -57,6 +67,35 @@ export function AdminRepairEditForm({ ticket }: { ticket: RepairEditData }) {
       setError("ไม่สามารถเชื่อมต่อระบบได้");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function onDelete() {
+    const confirmed = window.confirm(
+      `ต้องการลบใบแจ้งซ่อม "${ticket.title}" หรือไม่?\nประวัติสถานะและรูปประกอบที่เกี่ยวข้องจะถูกลบด้วย`,
+    );
+    if (!confirmed) return;
+
+    setError("");
+    setSuccess("");
+    setDeleting(true);
+
+    try {
+      const res = await fetch(`/api/admin/repairs/${ticket.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "ลบใบแจ้งซ่อมไม่สำเร็จ");
+        return;
+      }
+      notifyRepairsChanged();
+      router.push(deleteHref);
+      router.refresh();
+    } catch {
+      setError("ไม่สามารถเชื่อมต่อระบบได้");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -134,17 +173,25 @@ export function AdminRepairEditForm({ ticket }: { ticket: RepairEditData }) {
       <div className="flex flex-wrap gap-2 pt-1">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || deleting}
           className="rounded-xl bg-[var(--bd-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--bd-accent-hover)] disabled:opacity-60"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
         </button>
         <Link
-          href="/admin/database"
+          href={cancelHref}
           className="rounded-xl bg-[var(--bd-secondary)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--bd-secondary-hover)]"
         >
           กลับ
         </Link>
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={loading || deleting}
+          className="ml-auto rounded-xl bg-[#c45c5c] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#a94848] disabled:opacity-60"
+        >
+          {deleting ? "กำลังลบ..." : "ลบประวัติ"}
+        </button>
       </div>
     </form>
   );

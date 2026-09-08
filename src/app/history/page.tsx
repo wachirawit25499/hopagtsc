@@ -32,11 +32,16 @@ export default async function HistoryPage() {
           </h1>
           <p className="mt-1 text-sm text-[var(--bd-muted)]">
             ใบงานที่เสร็จสิ้นแล้ว สำหรับตรวจสอบย้อนหลัง
+            {user.role === "ADMIN"
+              ? " — ผู้ดูแลระบบสามารถแก้ไขหรือลบประวัติได้"
+              : ""}
           </p>
         </div>
         <TicketList
           tickets={tickets}
           canManage
+          isAdmin={user.role === "ADMIN"}
+          detailBasePath="/requests"
           emptyText="ยังไม่มีประวัติการแจ้งซ่อมที่เสร็จสิ้น"
         />
       </main>

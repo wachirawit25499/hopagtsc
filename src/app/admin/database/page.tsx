@@ -166,7 +166,7 @@ export default async function AdminDatabasePage() {
                           href={`/admin/database/repairs/${row.id}`}
                           className="font-medium text-[var(--bd-accent)] underline"
                         >
-                          แก้ไข
+                          แก้ไข / ลบ
                         </Link>
                       </td>
                     </tr>

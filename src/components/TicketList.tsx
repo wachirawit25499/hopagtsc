@@ -26,11 +26,13 @@ export function TicketList({
   canManage,
   emptyText,
   detailBasePath,
+  isAdmin = false,
 }: {
   tickets: TicketListItem[];
   canManage: boolean;
   emptyText: string;
   detailBasePath?: string;
+  isAdmin?: boolean;
 }) {
   if (tickets.length === 0) {
     return (
@@ -106,7 +108,7 @@ export function TicketList({
                       href={detailHref}
                       className="font-medium text-[var(--bd-accent)] underline"
                     >
-                      ดูรายละเอียดเต็ม
+                      {isAdmin ? "ดู / แก้ไขรายละเอียด" : "ดูรายละเอียดเต็ม"}
                     </Link>
                   )}
                 </div>

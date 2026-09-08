@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminRepairEditForm } from "@/components/AdminRepairEditForm";
 import { AppHeader } from "@/components/AppHeader";
 import { ImageViewer } from "@/components/ImageViewer";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -75,10 +76,12 @@ export default async function RequestDetailPage({ params }: Props) {
                 <StatusBadge status={ticket.status} />
               </div>
               <p className="mt-1 text-sm text-[var(--bd-muted)]">
-                รายละเอียดใบแจ้งซ่อมฉบับเต็ม
+                {user.role === "ADMIN"
+                  ? "รายละเอียดใบแจ้งซ่อมฉบับเต็ม — ผู้ดูแลระบบสามารถแก้ไขหรือลบได้"
+                  : "รายละเอียดใบแจ้งซ่อมฉบับเต็ม"}
               </p>
             </div>
-            {isOpen && (
+            {isOpen && user.role !== "ADMIN" && (
               <StatusSelect ticketId={ticket.id} current={ticket.status} />
             )}
           </div>
@@ -180,6 +183,29 @@ export default async function RequestDetailPage({ params }: Props) {
             )}
           </section>
         </div>
+
+        {user.role === "ADMIN" && (
+          <section className="animate-soft-in mt-6 rounded-2xl bg-[var(--bd-surface)] p-6 shadow-[0_10px_30px_rgba(28,36,48,0.08)]">
+            <h2 className="mb-4 text-lg font-semibold text-[var(--bd-ink)]">
+              แก้ไข / ลบประวัติการแจ้งซ่อม
+            </h2>
+            <p className="mb-4 text-sm text-[var(--bd-muted)]">
+              เปลี่ยนหัวข้อ อาการชำรุด สถานที่ หรือสถานะได้ และลบใบนี้ออกจากระบบได้
+            </p>
+            <AdminRepairEditForm
+              ticket={{
+                id: ticket.id,
+                title: ticket.title,
+                description: ticket.description,
+                location: ticket.location,
+                imagePath: ticket.imagePath,
+                status: ticket.status,
+              }}
+              cancelHref={backHref}
+              afterDeleteHref={backHref}
+            />
+          </section>
+        )}
       </main>
     </div>
   );

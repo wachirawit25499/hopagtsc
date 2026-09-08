@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
@@ -48,4 +48,17 @@ export async function saveRepairImage(file: File): Promise<string> {
   await writeFile(path.join(uploadDir, filename), buffer);
 
   return `/uploads/${filename}`;
+}
+
+export async function deleteRepairImageFile(imagePath: string | null) {
+  if (!imagePath) return;
+
+  const filename = imagePath.split("/").pop();
+  if (!filename || !isSafeUploadFilename(filename)) return;
+
+  try {
+    await unlink(path.join(getUploadDir(), filename));
+  } catch {
+    // Missing files should not block deleting the ticket.
+  }
 }

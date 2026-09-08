@@ -93,8 +93,8 @@
 | นักเรียนนักศึกษา (Tenant) | `/dashboard/[id]` | รายละเอียดเต็ม + ความคืบหน้าสถานะ |
 | นักเรียนนักศึกษา (Tenant) | `/repairs/new` | ฟอร์มแจ้งซ่อมใหม่ |
 | Technician / Admin | `/requests` คำขอแจ้งซ่อม | ใบงานค้าง + badge จำนวน + ป๊อปอัปเมื่อมีใบใหม่ |
-| Technician / Admin | `/requests/[id]` | รายละเอียดเต็มของคำขอ (อาการ, รูป, ผู้แจ้ง, ห้อง) |
-| Technician / Admin | `/history` ประวัติการแจ้งซ่อม | ใบงาน `COMPLETED` (ดูย้อนหลัง) |
+| Technician / Admin | `/history` ประวัติการแจ้งซ่อม | ใบงาน `COMPLETED` (ดูย้อนหลัง; Admin แก้ไข/ลบได้) |
+| Technician / Admin | `/requests/[id]` | รายละเอียดเต็มของคำขอ (อาการ, รูป, ผู้แจ้ง, ห้อง; Admin แก้ไข/ลบได้) |
 | Admin | `/admin/database` | ดู/แก้ไข/ลบตาราง User และ RepairTicket |
 
 ### สถานะงาน (Workflow)
@@ -131,6 +131,8 @@
 | Method | Endpoint | คำอธิบาย |
 |--------|----------|----------|
 | PATCH | `/api/repairs/[id]/status` | เปลี่ยนสถานะ (TECHNICIAN, ADMIN เท่านั้น) |
+| PATCH | `/api/admin/repairs/[id]` | Admin แก้ไขหัวข้อ/อาการ/สถานที่/สถานะ |
+| DELETE | `/api/admin/repairs/[id]` | Admin ลบใบแจ้งซ่อมและประวัติสถานะ |
 
 **Body:** `{ "status": "PENDING" | "IN_PROGRESS" | "COMPLETED" }`
 
