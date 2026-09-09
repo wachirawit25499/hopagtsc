@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyNewRepair, reporterDisplayName } from "@/lib/line";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { saveRepairImage } from "@/lib/upload";
@@ -93,6 +94,31 @@ export async function POST(request: Request) {
       });
 
       return created;
+    });
+
+    const reporter = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        namePrefix: true,
+        firstName: true,
+        lastName: true,
+        dormitory: true,
+        roomNumber: true,
+      },
+    });
+
+    void notifyNewRepair({
+      id: ticket.id,
+      title: ticket.title,
+      description: ticket.description,
+      location: ticket.location,
+      reporterName: reporter
+        ? reporterDisplayName(reporter)
+        : `${user.firstName} ${user.lastName}`.trim(),
+      dormitory: reporter?.dormitory,
+      roomNumber: reporter?.roomNumber,
+    }).catch(() => {
+      // LINE failures must not block creating a ticket.
     });
 
     return NextResponse.json({ ticket }, { status: 201 });

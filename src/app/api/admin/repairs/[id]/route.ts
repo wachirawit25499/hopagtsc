@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyStatusChange } from "@/lib/line";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { deleteRepairImageFile } from "@/lib/upload";
@@ -60,6 +61,17 @@ export async function PATCH(request: Request, { params }: Params) {
 
       return updated;
     });
+
+    if (existing.status !== parsed.data.status) {
+      void notifyStatusChange({
+        id: ticket.id,
+        title: ticket.title,
+        fromStatus: existing.status,
+        toStatus: ticket.status,
+      }).catch(() => {
+        // LINE failures must not block admin edits.
+      });
+    }
 
     return NextResponse.json({ ticket });
   } catch {

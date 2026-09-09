@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyStatusChange } from "@/lib/line";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { statusSchema } from "@/lib/validations";
@@ -55,6 +56,15 @@ export async function PATCH(request: Request, { params }: Params) {
       });
 
       return updated;
+    });
+
+    void notifyStatusChange({
+      id: ticket.id,
+      title: ticket.title,
+      fromStatus: existing.status,
+      toStatus: ticket.status,
+    }).catch(() => {
+      // LINE failures must not block status updates.
     });
 
     return NextResponse.json({ ticket });

@@ -79,3 +79,10 @@ model StatusChangeLog {
   @@index([changedById])
   @@index([createdAt])
 }
+
+/// ค่าตั้งค่าระบบ (เช่น LINE Messaging API)
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
