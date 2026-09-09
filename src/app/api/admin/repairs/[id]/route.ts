@@ -54,7 +54,7 @@ export async function PATCH(request: Request, { params }: Params) {
             fromStatus: existing.status,
             toStatus: parsed.data.status,
             changedById: auth.user!.id,
-            note: "แก้ไขโดยผู้ดูแลระบบผ่านหน้าฐานข้อมูล",
+            note: "แก้ไขโดยผู้ดูแลระบบ",
           },
         });
       }

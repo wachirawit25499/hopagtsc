@@ -1,5 +1,5 @@
 import { AppHeader } from "@/components/AppHeader";
-import { TicketList } from "@/components/TicketList";
+import { HistoryByDormitory } from "@/components/HistoryByDormitory";
 import { requireStaffUser } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 
@@ -31,18 +31,16 @@ export default async function HistoryPage() {
             ประวัติการแจ้งซ่อม
           </h1>
           <p className="mt-1 text-sm text-[var(--bd-muted)]">
-            ใบงานที่เสร็จสิ้นแล้ว สำหรับตรวจสอบย้อนหลัง
+            ใบงานที่เสร็จสิ้นแล้ว — เลือกหอพักจากดรอปดาวน์เพื่อกรองรายการ
             {user.role === "ADMIN"
-              ? " — ผู้ดูแลระบบสามารถแก้ไขหรือลบประวัติได้"
+              ? " ผู้ดูแลระบบสามารถแก้ไขหรือลบประวัติได้"
               : ""}
           </p>
         </div>
-        <TicketList
+
+        <HistoryByDormitory
           tickets={tickets}
-          canManage
           isAdmin={user.role === "ADMIN"}
-          detailBasePath="/requests"
-          emptyText="ยังไม่มีประวัติการแจ้งซ่อมที่เสร็จสิ้น"
         />
       </main>
     </div>

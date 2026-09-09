@@ -101,7 +101,7 @@ export function AppHeader({ user }: { user: SessionUser }) {
                     href="/admin/database"
                     active={pathname.startsWith("/admin/database")}
                   >
-                    ฐานข้อมูล
+                    จัดการข้อมูล
                   </NavLink>
                 )}
               </>

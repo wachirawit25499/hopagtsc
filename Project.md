@@ -93,9 +93,9 @@
 | นักเรียนนักศึกษา (Tenant) | `/dashboard/[id]` | รายละเอียดเต็ม + ความคืบหน้าสถานะ |
 | นักเรียนนักศึกษา (Tenant) | `/repairs/new` | ฟอร์มแจ้งซ่อมใหม่ |
 | Technician / Admin | `/requests` คำขอแจ้งซ่อม | ใบงานค้าง + badge จำนวน + ป๊อปอัปเมื่อมีใบใหม่ |
-| Technician / Admin | `/history` ประวัติการแจ้งซ่อม | ใบงาน `COMPLETED` (ดูย้อนหลัง; Admin แก้ไข/ลบได้) |
+| Technician / Admin | `/history` ประวัติการแจ้งซ่อม | ใบงาน `COMPLETED` กรองตามหอพักด้วยดรอปดาวน์ (Admin แก้ไข/ลบได้) |
 | Technician / Admin | `/requests/[id]` | รายละเอียดเต็มของคำขอ (อาการ, รูป, ผู้แจ้ง, ห้อง; Admin แก้ไข/ลบได้) |
-| Admin | `/admin/database` | ดู/แก้ไข/ลบตาราง User และ RepairTicket |
+| Admin | `/admin/database` | ดู/แก้ไข/ลบข้อมูลผู้ใช้และใบแจ้งซ่อม |
 
 ### สถานะงาน (Workflow)
 `PENDING` (รอดำเนินการ) → `IN_PROGRESS` (กำลังซ่อม) → `COMPLETED` (เสร็จสิ้น)

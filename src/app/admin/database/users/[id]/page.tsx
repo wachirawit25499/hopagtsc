@@ -37,12 +37,12 @@ export default async function AdminEditUserPage({ params }: Props) {
         <div className="animate-fade-up mb-6">
           <p className="text-sm text-[var(--bd-muted)]">
             <Link href="/admin/database" className="underline">
-              จัดการฐานข้อมูล
+              จัดการข้อมูล
             </Link>{" "}
             / แก้ไขผู้ใช้
           </p>
           <h1 className="mt-2 text-2xl font-bold text-[var(--bd-ink)]">
-            แก้ไขข้อมูล User
+            แก้ไขข้อมูลผู้ใช้งาน
           </h1>
         </div>
         <div className="animate-soft-in rounded-2xl bg-[var(--bd-surface)] p-6 shadow-[0_10px_30px_rgba(28,36,48,0.08)]">

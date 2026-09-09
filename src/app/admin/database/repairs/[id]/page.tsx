@@ -34,7 +34,7 @@ export default async function AdminEditRepairPage({ params }: Props) {
         <div className="animate-fade-up mb-6">
           <p className="text-sm text-[var(--bd-muted)]">
             <Link href="/admin/database" className="underline">
-              จัดการฐานข้อมูล
+              จัดการข้อมูล
             </Link>{" "}
             / แก้ไขใบแจ้งซ่อม
           </p>

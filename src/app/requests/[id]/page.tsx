@@ -148,7 +148,7 @@ export default async function RequestDetailPage({ params }: Props) {
 
           <section>
             <h2 className="text-sm font-semibold text-[var(--bd-ink)]">
-              ประวัติสถานะ (ฐานข้อมูล)
+              ประวัติสถานะ
             </h2>
             {ticket.statusLogs.length === 0 ? (
               <p className="mt-2 text-sm text-[var(--bd-muted)]">
