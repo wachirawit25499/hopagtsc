@@ -3,6 +3,9 @@ import { APP_NAME, STATUS_LABELS, formatDisplayName } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import type { TicketStatus } from "@prisma/client";
 
+/** ปิดไว้ก่อน — เปิดเป็น true เมื่อต้องการใช้แจ้งเตือน LINE อีกครั้ง */
+export const LINE_NOTIFICATIONS_ENABLED = false;
+
 const KEYS = {
   token: "line.channelAccessToken",
   secret: "line.channelSecret",
@@ -36,7 +39,8 @@ export async function getLineSettings(): Promise<LineSettings> {
     map[KEYS.secret]?.trim() || process.env.LINE_CHANNEL_SECRET?.trim() || "";
   const targetsRaw =
     map[KEYS.targets]?.trim() || process.env.LINE_TARGET_IDS?.trim() || "";
-  const enabled = (map[KEYS.enabled] ?? "true") !== "false";
+  const enabled =
+    LINE_NOTIFICATIONS_ENABLED && (map[KEYS.enabled] ?? "true") !== "false";
 
   return {
     token,
@@ -148,6 +152,9 @@ async function pushLineMessage(token: string, to: string, text: string) {
 }
 
 export async function sendLineText(text: string) {
+  if (!LINE_NOTIFICATIONS_ENABLED) {
+    return { sent: 0, skipped: true };
+  }
   const settings = await getLineSettings();
   if (!settings.enabled || !settings.token || settings.targets.length === 0) {
     return { sent: 0, skipped: true };

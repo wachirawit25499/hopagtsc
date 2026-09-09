@@ -96,7 +96,6 @@
 | Technician / Admin | `/history` ประวัติการแจ้งซ่อม | ใบงาน `COMPLETED` (ดูย้อนหลัง; Admin แก้ไข/ลบได้) |
 | Technician / Admin | `/requests/[id]` | รายละเอียดเต็มของคำขอ (อาการ, รูป, ผู้แจ้ง, ห้อง; Admin แก้ไข/ลบได้) |
 | Admin | `/admin/database` | ดู/แก้ไข/ลบตาราง User และ RepairTicket |
-| Admin | `/admin/line` | ตั้งค่าแจ้งเตือน LINE Official Account |
 
 ### สถานะงาน (Workflow)
 `PENDING` (รอดำเนินการ) → `IN_PROGRESS` (กำลังซ่อม) → `COMPLETED` (เสร็จสิ้น)
@@ -134,8 +133,6 @@
 | PATCH | `/api/repairs/[id]/status` | เปลี่ยนสถานะ (TECHNICIAN, ADMIN เท่านั้น) |
 | PATCH | `/api/admin/repairs/[id]` | Admin แก้ไขหัวข้อ/อาการ/สถานที่/สถานะ |
 | DELETE | `/api/admin/repairs/[id]` | Admin ลบใบแจ้งซ่อมและประวัติสถานะ |
-| GET / PATCH | `/api/admin/line` | Admin ตั้งค่า LINE และทดสอบส่งข้อความ |
-| POST | `/api/line/webhook` | รับ webhook จาก LINE เพื่อผูกกลุ่ม |
 
 **Body:** `{ "status": "PENDING" | "IN_PROGRESS" | "COMPLETED" }`
 
@@ -244,12 +241,7 @@
 ## 8. นอกขอบเขต MVP (Future)
 - มอบหมายงานให้ช่างเฉพาะคน
 - รายงานสถิติและ SLA
-- แจ้งเตือน LINE ถึงนักเรียนนักศึกษาเป็นรายบุคคล (ตอนนี้ส่งเข้ากลุ่มช่าง/แอดมิน)
-
-### แจ้งเตือน LINE (ทำแล้ว)
-ใช้ LINE Messaging API ไม่ใช้ LINE Notify (ปิดบริการแล้ว)
-- เมื่อมีใบแจ้งซ่อมใหม่ หรือเปลี่ยนสถานะ จะส่งข้อความเข้ากลุ่มที่ผูกไว้
-- ตั้งค่าได้ที่ `/admin/line`
+- แจ้งเตือน LINE (ปิดไว้ก่อน)
 
 ---
 

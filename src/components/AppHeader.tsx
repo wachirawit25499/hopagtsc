@@ -97,20 +97,12 @@ export function AppHeader({ user }: { user: SessionUser }) {
                   ประวัติการแจ้งซ่อม
                 </NavLink>
                 {isAdmin && (
-                  <>
-                    <NavLink
-                      href="/admin/database"
-                      active={pathname.startsWith("/admin/database")}
-                    >
-                      ฐานข้อมูล
-                    </NavLink>
-                    <NavLink
-                      href="/admin/line"
-                      active={pathname.startsWith("/admin/line")}
-                    >
-                      LINE
-                    </NavLink>
-                  </>
+                  <NavLink
+                    href="/admin/database"
+                    active={pathname.startsWith("/admin/database")}
+                  >
+                    ฐานข้อมูล
+                  </NavLink>
                 )}
               </>
             ) : (
