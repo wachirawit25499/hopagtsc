@@ -3,8 +3,8 @@ import { APP_NAME, STATUS_LABELS, formatDisplayName } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import type { TicketStatus } from "@prisma/client";
 
-/** ปิดไว้ก่อน — เปิดเป็น true เมื่อต้องการใช้แจ้งเตือน LINE อีกครั้ง */
-export const LINE_NOTIFICATIONS_ENABLED = false;
+/** เปิดการแจ้งเตือน LINE Messaging API */
+export const LINE_NOTIFICATIONS_ENABLED = true;
 
 const KEYS = {
   token: "line.channelAccessToken",
