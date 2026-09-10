@@ -30,11 +30,30 @@ export default async function AdminLinePage() {
               LINE Developers
             </a>
           </li>
-          <li>คัดลอก Channel access token และ Channel secret มาวางด้านล่าง</li>
+          <li>คัดลอก Channel access token และ Channel secret มาวางด้านล่าง แล้วกดบันทึก</li>
+          <li>
+            นำ Webhook URL ด้านล่างไปใส่ใน Messaging API → Webhook URL แล้วเปิด{" "}
+            <span className="font-medium text-[var(--bd-ink)]">Use webhook</span>{" "}
+            และกด Verify
+          </li>
+          <li>
+            ใน{" "}
+            <a
+              href="https://manager.line.biz/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[var(--bd-accent)] underline"
+            >
+              LINE Official Account Manager
+            </a>{" "}
+            → การตั้งค่า → การตอบกลับ ให้ปิด{" "}
+            <span className="font-medium text-[var(--bd-ink)]">ตอบกลับอัตโนมัติ</span>{" "}
+            และเปิด <span className="font-medium text-[var(--bd-ink)]">Webhook</span>
+          </li>
           <li>เปิด Allow bot to join group chats แล้วเชิญบอทเข้ากลุ่มช่าง/แอดมิน</li>
           <li>
             พิมพ์คำว่า <span className="font-medium text-[var(--bd-ink)]">ลงทะเบียน</span>{" "}
-            ในกลุ่มนั้น ระบบจะผูกกลุ่มให้อัตโนมัติ
+            ในกลุ่มนั้น ระบบจะผูกกลุ่มให้อัตโนมัติ แล้วกดรีเฟรชสถานะ
           </li>
         </ol>
 

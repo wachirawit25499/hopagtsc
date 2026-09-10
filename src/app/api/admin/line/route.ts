@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getLineSettings, saveLineSettings, sendLineText } from "@/lib/line";
+import {
+  getLineDiagnostics,
+  getLineSettings,
+  saveLineSettings,
+  sendLineText,
+} from "@/lib/line";
 import { requireUser } from "@/lib/session";
 
 async function requireAdmin() {
@@ -25,7 +30,11 @@ export async function GET() {
     return auth.error;
   }
 
-  const settings = await getLineSettings();
+  const [settings, diagnostics] = await Promise.all([
+    getLineSettings(),
+    getLineDiagnostics(),
+  ]);
+
   return NextResponse.json({
     enabled: settings.enabled,
     hasToken: Boolean(settings.token),
@@ -34,6 +43,7 @@ export async function GET() {
     secretMasked: maskSecret(settings.secret),
     targets: settings.targets,
     webhookUrl: "/api/line/webhook",
+    diagnostics,
   });
 }
 
@@ -61,19 +71,48 @@ export async function PATCH(request: Request) {
       keepSecret: !body.secret?.trim(),
     });
 
-    let testResult: { sent: number; skipped?: boolean; errors?: string[] } | null =
-      null;
+    let testResult:
+      | { sent: number; skipped?: boolean; errors?: string[]; reason?: string }
+      | null = null;
+
     if (body.test) {
-      testResult = await sendLineText(
-        "ทดสอบการแจ้งเตือนจากระบบแจ้งซ่อมหอพัก TSC\nถ้าเห็นข้อความนี้ แสดงว่าเชื่อมต่อ LINE สำเร็จ",
-      );
+      const settings = await getLineSettings();
+      if (!settings.enabled) {
+        testResult = {
+          sent: 0,
+          skipped: true,
+          reason: "ยังไม่ได้เปิดสวิตช์ “เปิดการแจ้งเตือนผ่าน LINE”",
+        };
+      } else if (!settings.token) {
+        testResult = {
+          sent: 0,
+          skipped: true,
+          reason: "ยังไม่ได้ใส่ Channel access token",
+        };
+      } else if (settings.targets.length === 0) {
+        testResult = {
+          sent: 0,
+          skipped: true,
+          reason:
+            "ยังไม่มีกลุ่มผู้รับ — เชิญบอทเข้ากลุ่มแล้วพิมพ์ “ลงทะเบียน” ในกลุ่ม",
+        };
+      } else {
+        testResult = await sendLineText(
+          "ทดสอบการแจ้งเตือนจากระบบแจ้งซ่อมหอพัก TSC\nถ้าเห็นข้อความนี้ แสดงว่าเชื่อมต่อ LINE สำเร็จ",
+        );
+      }
     }
 
-    const settings = await getLineSettings();
+    const [settings, diagnostics] = await Promise.all([
+      getLineSettings(),
+      getLineDiagnostics(),
+    ]);
+
     return NextResponse.json({
       ok: true,
       enabled: settings.enabled,
       targets: settings.targets,
+      diagnostics,
       testResult,
     });
   } catch {

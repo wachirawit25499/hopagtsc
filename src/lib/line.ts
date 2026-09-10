@@ -13,6 +13,8 @@ const KEYS = {
   enabled: "line.enabled",
 } as const;
 
+const WEBHOOK_LOG_KEY = "line.lastWebhook";
+
 export type LineSettings = {
   token: string;
   secret: string;
@@ -100,6 +102,75 @@ export async function addLineTarget(id: string) {
     update: { value: next.join("\n") },
   });
   return next;
+}
+
+export async function recordWebhookEvent(summary: string) {
+  const value = `${new Date().toISOString()} · ${summary}`;
+  try {
+    await prisma.appSetting.upsert({
+      where: { key: WEBHOOK_LOG_KEY },
+      create: { key: WEBHOOK_LOG_KEY, value },
+      update: { value },
+    });
+  } catch {
+    // Diagnostics must never break the webhook response.
+  }
+}
+
+async function getLastWebhook() {
+  const row = await prisma.appSetting.findUnique({
+    where: { key: WEBHOOK_LOG_KEY },
+  });
+  return row?.value ?? "";
+}
+
+async function checkToken(token: string) {
+  if (!token) {
+    return { ok: false, detail: "ยังไม่ได้ใส่ Channel access token" };
+  }
+  try {
+    const res = await fetch("https://api.line.me/v2/bot/info", {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { displayName?: string };
+      return {
+        ok: true,
+        detail: data.displayName
+          ? `เชื่อมต่อบัญชี "${data.displayName}" สำเร็จ`
+          : "Token ใช้งานได้",
+      };
+    }
+    if (res.status === 401) {
+      return { ok: false, detail: "Token ไม่ถูกต้องหรือหมดอายุ (401)" };
+    }
+    return { ok: false, detail: `LINE ตอบกลับสถานะ ${res.status}` };
+  } catch {
+    return { ok: false, detail: "ติดต่อ LINE API ไม่ได้" };
+  }
+}
+
+export async function getLineDiagnostics() {
+  const settings = await getLineSettings();
+  const [tokenCheck, lastWebhook] = await Promise.all([
+    checkToken(settings.token),
+    getLastWebhook(),
+  ]);
+
+  return {
+    enabled: settings.enabled,
+    hasToken: Boolean(settings.token),
+    hasSecret: Boolean(settings.secret),
+    targetCount: settings.targets.length,
+    tokenOk: tokenCheck.ok,
+    tokenDetail: tokenCheck.detail,
+    lastWebhook,
+    ready:
+      settings.enabled &&
+      tokenCheck.ok &&
+      settings.targets.length > 0,
+  };
 }
 
 export function getPublicAppUrl() {

@@ -2,6 +2,17 @@
 
 import { FormEvent, useEffect, useState } from "react";
 
+type LineDiagnostics = {
+  enabled: boolean;
+  hasToken: boolean;
+  hasSecret: boolean;
+  targetCount: number;
+  tokenOk: boolean;
+  tokenDetail: string;
+  lastWebhook: string;
+  ready: boolean;
+};
+
 type LineConfig = {
   enabled: boolean;
   hasToken: boolean;
@@ -9,7 +20,19 @@ type LineConfig = {
   tokenMasked: string;
   secretMasked: string;
   targets: string[];
+  diagnostics: LineDiagnostics;
 };
+
+function StatusRow({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span className={ok ? "text-[var(--bd-done)]" : "text-[#b45252]"}>
+        {ok ? "✓" : "✗"}
+      </span>
+      <span>{label}</span>
+    </li>
+  );
+}
 
 export function LineSettingsForm() {
   const [token, setToken] = useState("");
@@ -67,11 +90,17 @@ export function LineSettingsForm() {
       await load();
       if (test) {
         const result = data.testResult as
-          | { sent?: number; skipped?: boolean; errors?: string[] }
+          | {
+              sent?: number;
+              skipped?: boolean;
+              errors?: string[];
+              reason?: string;
+            }
           | undefined;
         if (result?.skipped) {
           setError(
-            "ยังส่งทดสอบไม่ได้ — กรอก Channel access token และผูกกลุ่ม LINE ก่อน",
+            result.reason ??
+              "ยังส่งทดสอบไม่ได้ — กรอก Channel access token และผูกกลุ่ม LINE ก่อน",
           );
         } else if (result?.errors?.length) {
           setError(result.errors[0] ?? "ส่งข้อความทดสอบไม่สำเร็จ");
@@ -93,8 +122,61 @@ export function LineSettingsForm() {
     await save(false);
   }
 
+  const diag = config?.diagnostics;
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {diag && (
+        <div
+          className={`rounded-xl border px-3.5 py-3 text-sm ${
+            diag.ready
+              ? "border-[var(--bd-done)] bg-[var(--bd-done-bg)]"
+              : "border-[#e0c3c3] bg-[#faf1f1]"
+          }`}
+        >
+          <p className="font-semibold">
+            {diag.ready
+              ? "สถานะ: พร้อมส่งแจ้งเตือน LINE"
+              : "สถานะ: ยังเชื่อมต่อไม่ครบ"}
+          </p>
+          <ul className="mt-2 space-y-1 text-xs">
+            <StatusRow
+              ok={diag.enabled}
+              label="เปิดสวิตช์แจ้งเตือน LINE แล้ว"
+            />
+            <StatusRow ok={diag.tokenOk} label={diag.tokenDetail} />
+            <StatusRow
+              ok={diag.hasSecret}
+              label={
+                diag.hasSecret
+                  ? "ใส่ Channel secret แล้ว"
+                  : "ยังไม่ใส่ Channel secret (ใส่เพื่อให้ webhook ปลอดภัย)"
+              }
+            />
+            <StatusRow
+              ok={diag.targetCount > 0}
+              label={
+                diag.targetCount > 0
+                  ? `มีผู้รับ ${diag.targetCount} รายการ`
+                  : 'ยังไม่มีผู้รับ — เชิญบอทเข้ากลุ่มแล้วพิมพ์ "ลงทะเบียน"'
+              }
+            />
+          </ul>
+          <p className="mt-2 break-words text-xs text-[var(--bd-muted)]">
+            {diag.lastWebhook
+              ? `webhook ล่าสุด: ${diag.lastWebhook}`
+              : "ยังไม่เคยได้รับ webhook จาก LINE — กด Verify ใน LINE Developers เพื่อทดสอบ"}
+          </p>
+          <button
+            type="button"
+            onClick={() => void load()}
+            className="mt-2 text-xs font-medium underline"
+          >
+            รีเฟรชสถานะ
+          </button>
+        </div>
+      )}
+
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
