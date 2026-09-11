@@ -182,7 +182,7 @@ export function getPublicAppUrl() {
   if (railway) {
     return `https://${railway.replace(/^https?:\/\//, "")}`;
   }
-  return "https://hopagtsc-production.up.railway.app";
+  return "https://tscdome.alexan.studio";
 }
 
 export function verifyLineSignatureWithSecret(
